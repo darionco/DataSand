@@ -4,7 +4,8 @@
   "description": "Make sure to install the PNaCl SDK: https://developer.chrome.com/native-client/sdk/download",
   "main": "index.js",
   "scripts": {
-    "build": "mkdir -p intermediates; NACL_SDK_ROOT=\"../nacl_sdk/pepper_49\" make",
+	"setup": "curl -O https://storage.googleapis.com/nativeclient-mirror/nacl/nacl_sdk/nacl_sdk.zip; unzip nacl_sdk.zip; cd nacl_sdk; ./naclsdk update pepper_49; cd ..; rm ./nacl_sdk.zip",
+    "build": "mkdir -p intermediates; NACL_SDK_ROOT=\"./nacl_sdk/pepper_49\" make",
 	"serve": "./node_modules/.bin/http-server --cors ./demo"
   },
   "repository": {
