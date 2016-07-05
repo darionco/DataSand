@@ -1,0 +1,22 @@
+{
+  "name": "datasand",
+  "version": "1.0.0",
+  "description": "Make sure to install the PNaCl SDK: https://developer.chrome.com/native-client/sdk/download",
+  "main": "index.js",
+  "scripts": {
+    "build": "mkdir -p intermediates; NACL_SDK_ROOT=\"../nacl_sdk/pepper_49\" make",
+	"serve": "./node_modules/.bin/http-server --cors ./demo"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/darionco/DataSand.git"
+  },
+  "author": "Dario Segura",
+  "bugs": {
+    "url": "https://github.com/darionco/DataSand/issues"
+  },
+  "homepage": "https://github.com/darionco/DataSand#readme",
+  "devDependencies": {
+    "http-server": "^0.9.0"
+  }
+}
