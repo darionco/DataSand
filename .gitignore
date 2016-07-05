@@ -33,3 +33,7 @@
 # Dependency directories
 node_modules
 jspm_packages
+nacl_sdk
+
+# Log Files
+*.log
