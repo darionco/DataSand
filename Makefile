@@ -26,7 +26,7 @@ CXX_SOURCES := $(patsubst ./$(SOURCE_FOLDER)/%.cpp,%.cpp,$(CXX_SOURCES))
 
 # Project Build flags
 WARNINGS := -Wno-long-long -Wall -Wswitch-enum -pedantic -Werror
-CXXFLAGS := -pthread -std=gnu++98 $(WARNINGS)
+CXXFLAGS := -pthread -std=c++0x $(WARNINGS)
 
 #
 # Compute tool paths
