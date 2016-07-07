@@ -13,11 +13,13 @@ class DSDataFormatter
 {
     GSGThreadLock *m_lock;
     std::string m_filename;
+    std::string m_file;
 
 public:
     DSDataFormatter(std::string filename, GSGThreadLock *lock);
     ~DSDataFormatter();
 
+    bool loadCsvFile(std::string file);
     bool update();
 };
 
