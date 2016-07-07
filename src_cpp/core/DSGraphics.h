@@ -23,12 +23,15 @@ class DSGraphics {
 
     GLuint m_vertexShader;
     GLuint m_fragmentShader;
+    GLuint m_program;
 
     GLuint m_positionSlot01;
     GLuint m_positionSlot02;
     GLuint m_colorSlot01;
     GLuint m_colorSlot02;
-    GLuint m_program;
+    GLuint m_interpolationUniform;
+
+    GLfloat m_animationTest;
 
     GLuint m_vertexBuffer;
     GLuint m_indexBuffer;

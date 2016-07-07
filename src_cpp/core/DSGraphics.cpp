@@ -5,6 +5,8 @@
 #include "DSGraphics.h"
 #include "printToConsole.h"
 
+#include <math.h>
+
 #include "ppapi/lib/gl/gles2/gl2ext_ppapi.h"
 #include "ppapi/cpp/module.h"
 
@@ -20,10 +22,10 @@ typedef struct {
 } Vertex;
 
 Vertex vertices[] = {
-        {{1, -1}, {1, -1}, {1, 0, 0}, {1, 0, 0}},
-        {{1, 1}, {1, 1}, {0, 1, 0}, {0, 1, 0}},
-        {{-1, 1}, {-1, 1}, {0, 0, 1}, {0, 0, 1}},
-        {{-1, -1}, {-1, -1}, {0, 0, 0}, {0, 0, 0}}
+        {{1, -1}, {1, -1}, {1, 0, 0}, {1, 1, 0}},
+        {{1, 1}, {1, 1}, {0, 1, 0}, {0, 1, 1}},
+        {{-1, 1}, {-1, 1}, {0, 0, 1}, {1, 0, 1}},
+        {{-1, -1}, {-1, -1}, {0, 0, 0}, {1, 1, 1}}
 };
 
 const GLubyte indices[] = {
@@ -57,6 +59,8 @@ DSGraphics::DSGraphics(pp::Graphics3D *context, int32_t width, int32_t height) {
     m_positionSlot02 = glGetAttribLocation(m_program, "positionTwo");
     m_colorSlot02 = glGetAttribLocation(m_program, "colorTwo");
 
+    m_interpolationUniform = glGetUniformLocation(m_program, "interpolation");
+
     for (int i = 0; i < 4; ++i) {
         vertices[i].positionOne[0] *= m_dataPointWidth;
         vertices[i].positionOne[1] *= m_dataPointHeight;
@@ -72,6 +76,8 @@ DSGraphics::DSGraphics(pp::Graphics3D *context, int32_t width, int32_t height) {
     glGenBuffers(1, &m_indexBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices[0], GL_STATIC_DRAW);
+
+    m_animationTest = 0.0f;
 }
 
 DSGraphics::~DSGraphics() {
@@ -83,6 +89,9 @@ void DSGraphics::render() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(m_program);
+
+    m_animationTest += 0.01;
+    glUniform1f(m_interpolationUniform, fabsf(sin(m_animationTest)));
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
