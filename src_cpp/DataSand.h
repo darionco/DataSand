@@ -8,11 +8,14 @@
 #include "ppapi/cpp/instance.h"
 #include "ppapi/cpp/module.h"
 #include "ppapi/cpp/var.h"
+#include "ppapi/cpp/graphics_3d.h"
 
 #include "core/DSTaskScheduler.h"
 
 class DataSandInstance : public pp::Instance {
+
     DSTaskScheduler *m_taskScheduler;
+    pp::Graphics3D m_context;
 
 public:
     /// The constructor creates the plugin-side instance.
@@ -21,11 +24,8 @@ public:
 
     virtual ~DataSandInstance();
 
-    /// Handler for messages coming in from the browser via postMessage().  The
-    /// @a var_message can contain be any pp:Var type; for example int, string
-    /// Array or Dictinary. Please see the pp:Var documentation for more details.
-    /// @param[in] var_message The message posted by the browser.
     virtual void HandleMessage(const pp::Var &var_message);
+    virtual void DidChangeView(const pp::View& view);
 
     void printToConsole(std::string message);
 };

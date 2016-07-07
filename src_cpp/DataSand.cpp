@@ -1,9 +1,11 @@
 #include "DataSand.h"
 #include "core/printToConsole.h"
 
+#include <GLES2/gl2.h>
+#include "ppapi/lib/gl/gles2/gl2ext_ppapi.h"
+
 DataSandInstance::DataSandInstance(PP_Instance instance) : pp::Instance(instance) {
     setGlobalInstance(this);
-    m_taskScheduler = new DSTaskScheduler();
 }
 
 DataSandInstance::~DataSandInstance() {
@@ -19,6 +21,48 @@ void DataSandInstance::HandleMessage(const pp::Var &var_message) {
 //    if (message == "Hello") {
 //        printToConsole("Holy chow!");
 //    }
+}
+
+void DataSandInstance::DidChangeView(const pp::View &view) {
+    if (m_context.is_null()) {
+        if (!glInitializePPAPI(pp::Module::Get()->get_browser_interface())) {
+            printToConsole("Unable to initialize GL PPAPI!");
+            return;
+        }
+
+        int32_t width = view.GetRect().width() * view.GetDeviceScale();
+        int32_t height = view.GetRect().height() * view.GetDeviceScale();
+
+        if (width == 0 || height == 0) {
+            printToConsole("View size cannot be zero in any axis.");
+            return;
+        }
+
+        printToConsole("Width: " + std::to_string(width));
+        printToConsole("Height: " +std::to_string(height));
+
+        const int32_t attrib_list[] = {
+                PP_GRAPHICS3DATTRIB_ALPHA_SIZE, 8,
+                PP_GRAPHICS3DATTRIB_DEPTH_SIZE, 24,
+                PP_GRAPHICS3DATTRIB_WIDTH, width,
+                PP_GRAPHICS3DATTRIB_HEIGHT, height,
+                PP_GRAPHICS3DATTRIB_NONE
+        };
+
+        m_context = pp::Graphics3D(this, attrib_list);
+        if (!BindGraphics(m_context)) {
+            printToConsole("Unable to bind 3d context!");
+            m_context = pp::Graphics3D();
+            glSetCurrentContextPPAPI(0);
+            return;
+        }
+
+        glSetCurrentContextPPAPI(m_context.pp_resource());
+
+        if (!m_taskScheduler) {
+            m_taskScheduler = new DSTaskScheduler();
+        }
+    }
 }
 
 void DataSandInstance::printToConsole(std::string message) {
