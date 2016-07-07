@@ -40,9 +40,6 @@ void DSDataFormatter::loadCsvFile(std::string file) {
 }
 
 bool DSDataFormatter::update() {
-    /* print...? */
-    printToConsole("DSDataFormatter Update()");
-
     /* check if we need to perform changes */
     if (true) { /* replace with condition */
         /* always lock before changing data */

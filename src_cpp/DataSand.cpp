@@ -42,7 +42,7 @@ void DataSandInstance::DidChangeView(const pp::View &view) {
         }
 
         printToConsole("Viewport Width: " + std::to_string(width));
-        printToConsole("Viewport Height: " +std::to_string(height));
+        printToConsole("Viewport Height: " + std::to_string(height));
 
         const int32_t attrib_list[] = {
                 PP_GRAPHICS3DATTRIB_ALPHA_SIZE, 8,
@@ -61,6 +61,14 @@ void DataSandInstance::DidChangeView(const pp::View &view) {
         }
 
         glSetCurrentContextPPAPI(m_context.pp_resource());
+
+        int32_t result = m_context.ResizeBuffers(width, height);
+        if (result < 0) {
+            printToConsole("Unable to resize buffers to " + std::to_string(width) + "x" + std::to_string(height));
+            return;
+        }
+
+        glViewport(0, 0, width, height);
 
         if (!m_taskScheduler) {
             DSDataFormatter *dataFormatter = new DSDataFormatter();

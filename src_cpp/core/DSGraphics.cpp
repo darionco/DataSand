@@ -18,3 +18,12 @@ DSGraphics::DSGraphics(pp::Graphics3D *context, int32_t width, int32_t height) {
 DSGraphics::~DSGraphics() {
 
 }
+
+void DSGraphics::render() {
+    glClearColor(0, 104.0/255.0, 55.0/255.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
+pp::Graphics3D *DSGraphics::context() {
+    return m_context;
+}
