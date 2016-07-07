@@ -15,6 +15,15 @@
 THIS_MAKEFILE := $(abspath $(lastword $(MAKEFILE_LIST)))
 NACL_SDK_ROOT ?= $(abspath $(dir $(THIS_MAKEFILE))../..)
 
+# Project Config
+PROJECT := DataSand
+BUILD_FOLDER := intermediates
+SOURCE_FOLDER := src_cpp
+PRODUCT_FOLDER := demo
+CXX_SOURCES := $(shell find ./$(SOURCE_FOLDER) -name *.cpp)
+CXX_OBJECTS := $(patsubst ./$(SOURCE_FOLDER)/%.cpp,$(BUILD_FOLDER)/%.o,$(CXX_SOURCES))
+CXX_SOURCES := $(patsubst ./$(SOURCE_FOLDER)/%.cpp,%.cpp,$(CXX_SOURCES))
+
 # Project Build flags
 WARNINGS := -Wno-long-long -Wall -Wswitch-enum -pedantic -Werror
 CXXFLAGS := -pthread -std=gnu++98 $(WARNINGS)
@@ -30,8 +39,8 @@ RM := $(OSHELPERS) rm
 PNACL_TC_PATH := $(abspath $(NACL_SDK_ROOT)/toolchain/$(OSNAME)_pnacl)
 PNACL_CXX := $(PNACL_TC_PATH)/bin/pnacl-clang++
 PNACL_FINALIZE := $(PNACL_TC_PATH)/bin/pnacl-finalize
-CXXFLAGS := -I$(NACL_SDK_ROOT)/include
-LDFLAGS := -L$(NACL_SDK_ROOT)/lib/pnacl/Release -lppapi_cpp -lppapi
+CXXFLAGS := -I$(NACL_SDK_ROOT)/include -I$(NACL_SDK_ROOT)/include/newlib
+LDFLAGS := -L$(NACL_SDK_ROOT)/lib/pnacl/Release -lppapi_cpp -lppapi 
 
 #
 # Disable DOS PATH warning when using Cygwin based tools Windows
@@ -39,25 +48,24 @@ LDFLAGS := -L$(NACL_SDK_ROOT)/lib/pnacl/Release -lppapi_cpp -lppapi
 CYGWIN ?= nodosfilewarning
 export CYGWIN
 
+.PHONY: all clean
 
 # Declare the ALL target first, to make the 'all' target the default build
-all: ./demo/hello_tutorial.pexe
+all: $(PROJECT)
+
+define make-object
+    $(BUILD_FOLDER)/$1.o: $(SOURCE_FOLDER)/$1.cpp
+	mkdir -p $(dir $(BUILD_FOLDER)/$1.o)
+	$(PNACL_CXX) -o $(BUILD_FOLDER)/$1.o $(SOURCE_FOLDER)/$1.cpp -O2 $(CXXFLAGS) $(LDFLAGS) -c
+endef
+
+$(foreach file,$(CXX_SOURCES),$(eval $(call make-object,$(basename $(file)))))
 
 clean:
-	$(RM) ./demo/hello_tutorial.pexe ./intermediates/hello_tutorial.bc
+	$(RM) $(CXX_OBJECTS)
+	$(RM) ./$(PRODUCT_FOLDER)/$(PROJECT).raw.pexe
+	$(RM) ./$(PRODUCT_FOLDER)/$(PROJECT).pexe
 
-./intermediates/hello_tutorial.bc: ./src_cpp/hello_tutorial.cc
-	$(PNACL_CXX) -o $@ $< -O2 $(CXXFLAGS) $(LDFLAGS)
-
-./demo/hello_tutorial.pexe: ./intermediates/hello_tutorial.bc
-	$(PNACL_FINALIZE) -o $@ $<
-
-
-#
-# Makefile target to run the SDK's simple HTTP server and serve this example.
-#
-HTTPD_PY := python $(NACL_SDK_ROOT)/tools/httpd.py
-
-.PHONY: serve
-serve: all
-	$(HTTPD_PY) -C $(CURDIR)
+$(PROJECT): $(CXX_OBJECTS)
+	$(PNACL_CXX) -o $(PRODUCT_FOLDER)/$@.raw.pexe $(CXX_OBJECTS) -O2 $(CXXFLAGS) $(LDFLAGS)
+	$(PNACL_FINALIZE) -o $(PRODUCT_FOLDER)/$@.pexe $(PRODUCT_FOLDER)/$@.raw.pexe

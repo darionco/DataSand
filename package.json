@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
 	"setup": "curl -O https://storage.googleapis.com/nativeclient-mirror/nacl/nacl_sdk/nacl_sdk.zip; unzip nacl_sdk.zip; cd nacl_sdk; ./naclsdk update pepper_49; cd ..; rm ./nacl_sdk.zip",
-    "build": "mkdir -p intermediates; NACL_SDK_ROOT=\"./nacl_sdk/pepper_49\" make",
+    "build": "NACL_SDK_ROOT=\"./nacl_sdk/pepper_49\" make",
+    "clean": "NACL_SDK_ROOT=\"./nacl_sdk/pepper_49\" make clean",
 	"serve": "./node_modules/.bin/http-server --cors ./demo"
   },
   "repository": {
