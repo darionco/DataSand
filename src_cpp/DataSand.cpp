@@ -1,6 +1,7 @@
 #include "DataSand.h"
 #include "core/printToConsole.h"
 #include "core/DSDataFormater.h"
+#include "core/DSGraphics.h"
 
 #include <GLES2/gl2.h>
 #include "ppapi/lib/gl/gles2/gl2ext_ppapi.h"
@@ -20,7 +21,7 @@ void DataSandInstance::HandleMessage(const pp::Var &var_message) {
     std::string message = var_message.AsString();
     // assume its csv file for now when size > 100
     if (message.size() > 100) {
-        auto dataFormatter = m_taskScheduler->m_dataFormatter;
+        DSDataFormatter *dataFormatter = m_taskScheduler->dataFormatter();
         dataFormatter->loadCsvFile(message);
     }
 }
@@ -40,8 +41,8 @@ void DataSandInstance::DidChangeView(const pp::View &view) {
             return;
         }
 
-        printToConsole("Width: " + std::to_string(width));
-        printToConsole("Height: " +std::to_string(height));
+        printToConsole("Viewport Width: " + std::to_string(width));
+        printToConsole("Viewport Height: " +std::to_string(height));
 
         const int32_t attrib_list[] = {
                 PP_GRAPHICS3DATTRIB_ALPHA_SIZE, 8,
@@ -62,7 +63,9 @@ void DataSandInstance::DidChangeView(const pp::View &view) {
         glSetCurrentContextPPAPI(m_context.pp_resource());
 
         if (!m_taskScheduler) {
-            m_taskScheduler = new DSTaskScheduler();
+            DSDataFormatter *dataFormatter = new DSDataFormatter();
+            DSGraphics *graphics = new DSGraphics(&m_context, width, height);
+            m_taskScheduler = new DSTaskScheduler(dataFormatter, graphics);
         }
     }
 }

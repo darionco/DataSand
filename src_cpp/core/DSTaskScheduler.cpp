@@ -5,19 +5,25 @@
 #include "DSTaskScheduler.h"
 #include "printToConsole.h"
 
-#include "../GSGThreading/GSGThread.h"
-#include "../GSGThreading/GSGThreadLock.h"
 #include "DSDataFormater.h"
+#include "DSGraphics.h"
 
-DSTaskScheduler::DSTaskScheduler() {
+DSTaskScheduler::DSTaskScheduler(DSDataFormatter *dataFormatter, DSGraphics *graphics) {
     printToConsole("Initializing task scheduler...");
 
-    m_dataFormatterLock = new GSGThreadLock();
+    m_graphics = graphics;
 
-    m_dataFormatter = new DSDataFormatter("sample_data.csv", m_dataFormatterLock);
+    m_dataFormatter = dataFormatter;
     m_dataFormatter->update();
 }
 
 DSTaskScheduler::~DSTaskScheduler() {
-    delete m_dataFormatter;
+}
+
+DSDataFormatter *DSTaskScheduler::dataFormatter() {
+    return m_dataFormatter;
+}
+
+DSGraphics *DSTaskScheduler::graphics() {
+    return m_graphics;
 }

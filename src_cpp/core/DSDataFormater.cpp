@@ -8,10 +8,8 @@
 #include "../GSGThreading/GSGThreadLock.h"
 #include "../csv-parser/CSVparser.hpp"
 
-DSDataFormatter::DSDataFormatter(std::string filename, GSGThreadLock *lock) {
-    printToConsole("Initializing DSDataFormatter with file: " + filename);
-    m_filename = filename;
-    m_lock = lock;
+DSDataFormatter::DSDataFormatter() {
+    m_lock = new GSGThreadLock();
 }
 
 DSDataFormatter::~DSDataFormatter() {
