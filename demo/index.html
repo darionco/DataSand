@@ -7,11 +7,21 @@
     <script type="text/javascript">
         var DataSandModule = null;  // Global application object.
 
+        function pageDidLoad() {
+            var module = document.createElement('embed');
+            module.setAttribute('id', 'data_sand');
+            module.setAttribute('width', window.document.body.scrollWidth + 'px');
+            module.setAttribute('height', window.document.body.scrollHeight + 'px');
+            module.setAttribute('src', 'DataSand.nmf');
+            module.setAttribute('type', 'application/x-pnacl');
+
+            var listener = document.getElementById('listener');
+            listener.appendChild(module);
+        }
+
         // Indicate load success.
         function moduleDidLoad() {
             DataSandModule = document.getElementById('data_sand');
-            DataSandModule.setAttribute('width', window.document.body.scrollWidth + 'px');
-            DataSandModule.setAttribute('height', window.document.body.scrollHeight + 'px');
 //            DataSandModule.postMessage('Hello');
         }
 
@@ -24,18 +34,13 @@
         }
     </script>
 </head>
-<body style="margin: 0px; padding: 0px">
+<body style="margin: 0px; padding: 0px" onload="pageDidLoad()">
 <div id="listener">
     <script type="text/javascript">
         var listener = document.getElementById('listener');
         listener.addEventListener('load', moduleDidLoad, true);
         listener.addEventListener('message', handleMessage, true);
     </script>
-
-    <embed id="data_sand"
-           width=0 height=0
-           src="DataSand.nmf"
-           type="application/x-pnacl"/>
 </div>
 
 <div class="" style="position: absolute; top: 0; left: 0;">
