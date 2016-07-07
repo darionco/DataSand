@@ -14,7 +14,7 @@ DSTaskScheduler::DSTaskScheduler() {
 
     m_dataFormatterLock = new GSGThreadLock();
 
-    m_dataFormatter = new DSDataFormatter("sample_data.csv", m_dataFormatterLock);
+    m_dataFormatter = new DSDataFormatter(m_dataFormatterLock);
     m_dataFormatter->update();
 }
 

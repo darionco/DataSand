@@ -7,9 +7,7 @@
 
 #include "../GSGThreading/GSGThreadLock.h"
 
-DSDataFormatter::DSDataFormatter(std::string filename, GSGThreadLock *lock) {
-    printToConsole("Initializing DSDataFormatter with file: " + filename);
-    m_filename = filename;
+DSDataFormatter::DSDataFormatter(GSGThreadLock *lock) {
     m_lock = lock;
 }
 
