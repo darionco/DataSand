@@ -5,6 +5,8 @@
 #include "DSGraphics.h"
 #include "printToConsole.h"
 
+#include <math.h>
+
 #include "ppapi/lib/gl/gles2/gl2ext_ppapi.h"
 #include "ppapi/cpp/module.h"
 
@@ -13,18 +15,20 @@
 #include "DSFragmentShader.h"
 
 typedef struct {
-    float Position[3];
-    float Color[4];
+    float positionOne[2];
+    float positionTwo[2];
+    float colorOne[3];
+    float colorTwo[3];
 } Vertex;
 
-const Vertex Vertices[] = {
-        {{1, -1, 0}, {1, 0, 0, 1}},
-        {{1, 1, 0}, {0, 1, 0, 1}},
-        {{-1, 1, 0}, {0, 0, 1, 1}},
-        {{-1, -1, 0}, {0, 0, 0, 1}}
+Vertex vertices[] = {
+        {{1, -1}, {1, -1}, {1, 0, 0}, {1, 1, 0}},
+        {{1, 1}, {1, 1}, {0, 1, 0}, {0, 1, 1}},
+        {{-1, 1}, {-1, 1}, {0, 0, 1}, {1, 0, 1}},
+        {{-1, -1}, {-1, -1}, {0, 0, 0}, {1, 1, 1}}
 };
 
-const GLubyte Indices[] = {
+const GLubyte indices[] = {
         0, 1, 2,
         2, 3, 0
 };
@@ -33,6 +37,12 @@ DSGraphics::DSGraphics(pp::Graphics3D *context, int32_t width, int32_t height) {
     m_context = context;
     m_width = width;
     m_height = height;
+
+    m_pixelScaleX = 1.0f / m_width;
+    m_pixelScaleY = 1.0f / m_height;
+
+    m_dataPointWidth = m_pixelScaleX * 10.0f;
+    m_dataPointHeight = m_pixelScaleY * 10.0f;
 
     m_vertexShader = compileShader(GL_VERTEX_SHADER, dataSand_vertex_shader_src);
 //    printToConsole("m_vertexShader: " + std::to_string(m_vertexShader));
@@ -43,16 +53,31 @@ DSGraphics::DSGraphics(pp::Graphics3D *context, int32_t width, int32_t height) {
     m_program = linkProgram(m_fragmentShader, m_vertexShader);
 //    printToConsole("m_program: " + std::to_string(m_program));
 
-    m_positionSlot = glGetAttribLocation(m_program, "Position");
-    m_colorSlot = glGetAttribLocation(m_program, "SourceColor");
+    m_positionSlot01 = glGetAttribLocation(m_program, "positionOne");
+    m_colorSlot01 = glGetAttribLocation(m_program, "colorOne");
+
+    m_positionSlot02 = glGetAttribLocation(m_program, "positionTwo");
+    m_colorSlot02 = glGetAttribLocation(m_program, "colorTwo");
+
+    m_interpolationUniform = glGetUniformLocation(m_program, "interpolation");
+
+    for (int i = 0; i < 4; ++i) {
+        vertices[i].positionOne[0] *= m_dataPointWidth;
+        vertices[i].positionOne[1] *= m_dataPointHeight;
+
+        vertices[i].positionTwo[0] *= m_dataPointWidth * 30.0f;
+        vertices[i].positionTwo[1] *= m_dataPointHeight * 30.0f;
+    }
     
     glGenBuffers(1, &m_vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), &Vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
 
     glGenBuffers(1, &m_indexBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), &Indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices[0], GL_STATIC_DRAW);
+
+    m_animationTest = 0.0f;
 }
 
 DSGraphics::~DSGraphics() {
@@ -65,25 +90,45 @@ void DSGraphics::render() {
 
     glUseProgram(m_program);
 
+    m_animationTest += 0.01;
+    glUniform1f(m_interpolationUniform, fabsf(sin(m_animationTest)));
+
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-    glVertexAttribPointer(m_positionSlot,
+
+    glVertexAttribPointer(m_positionSlot01,
+                          2,
+                          GL_FLOAT,
+                          GL_FALSE,
+                          sizeof(Vertex),
+                          reinterpret_cast<void*>(offsetof(Vertex, positionOne)));
+    glEnableVertexAttribArray(m_positionSlot01);
+
+    glVertexAttribPointer(m_colorSlot01,
                           3,
                           GL_FLOAT,
                           GL_FALSE,
                           sizeof(Vertex),
-                          reinterpret_cast<void*>(offsetof(Vertex, Position)));
-    glEnableVertexAttribArray(m_positionSlot);
+                          reinterpret_cast<void*>(offsetof(Vertex, colorOne)));
+    glEnableVertexAttribArray(m_colorSlot01);
 
-    glVertexAttribPointer(m_colorSlot,
-                          4,
+    glVertexAttribPointer(m_positionSlot02,
+                          2,
                           GL_FLOAT,
                           GL_FALSE,
                           sizeof(Vertex),
-                          reinterpret_cast<void*>(sizeof(float) * 3));
-    glEnableVertexAttribArray(m_colorSlot);
+                          reinterpret_cast<void*>(offsetof(Vertex, positionTwo)));
+    glEnableVertexAttribArray(m_positionSlot02);
+
+    glVertexAttribPointer(m_colorSlot02,
+                          3,
+                          GL_FLOAT,
+                          GL_FALSE,
+                          sizeof(Vertex),
+                          reinterpret_cast<void*>(offsetof(Vertex, colorTwo)));
+    glEnableVertexAttribArray(m_colorSlot02);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-    glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
+    glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]),
                    GL_UNSIGNED_BYTE, 0);
 }
 
