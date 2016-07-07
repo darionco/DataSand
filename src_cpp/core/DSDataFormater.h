@@ -13,11 +13,10 @@ class GSGThreadLock;
 class DSDataFormatter
 {
     struct dataPoint {
-        float x1;
-        float y1;
-        float x2;
-        float y2;
-        int flag;
+        float FirstPosition[2];
+        float SecondPosition[2];
+        float FirstColor[3];
+        float SecondColor[3];
     };
     std::vector<dataPoint> m_dataPoints;
     GSGThreadLock *m_lock;
