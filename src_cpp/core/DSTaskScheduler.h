@@ -13,11 +13,11 @@ class DSTaskScheduler
 {
     GSGThread *m_dataFormatterThread;
     GSGThreadLock *m_dataFormatterLock;
-    DSDataFormatter *m_dataFormatter;
 
 public:
     DSTaskScheduler();
     ~DSTaskScheduler();
+    DSDataFormatter *m_dataFormatter;
 };
 
 #endif //DATASAND_DSTASKSCHEDULER_H

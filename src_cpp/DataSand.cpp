@@ -1,5 +1,6 @@
 #include "DataSand.h"
 #include "core/printToConsole.h"
+#include "core/DSDataFormater.h"
 
 #include <GLES2/gl2.h>
 #include "ppapi/lib/gl/gles2/gl2ext_ppapi.h"
@@ -16,11 +17,12 @@ void DataSandInstance::HandleMessage(const pp::Var &var_message) {
     if (!var_message.is_string()) {
         return;
     }
-//
-//    std::string message = var_message.AsString();
-//    if (message == "Hello") {
-//        printToConsole("Holy chow!");
-//    }
+    std::string message = var_message.AsString();
+    // assume its csv file for now when size > 100
+    if (message.size() > 100) {
+        auto dataFormatter = m_taskScheduler->m_dataFormatter;
+        dataFormatter->loadCsvFile(message);
+    }
 }
 
 void DataSandInstance::DidChangeView(const pp::View &view) {

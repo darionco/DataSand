@@ -17,6 +17,13 @@ DSDataFormatter::~DSDataFormatter() {
 
 }
 
+bool DSDataFormatter::loadCsvFile(std::string file) {
+    m_file = file;
+    std::string text = "Loaded CSV file size: ";
+    printToConsole(text + std::to_string(m_file.size()));
+    return false;
+}
+
 bool DSDataFormatter::update() {
     /* print...? */
     printToConsole("DSDataFormatter Update()");
