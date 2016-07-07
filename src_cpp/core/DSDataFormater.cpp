@@ -16,7 +16,7 @@ DSDataFormatter::~DSDataFormatter() {
 
 }
 
-bool DSDataFormatter::loadCsvFile(std::string file) {
+void DSDataFormatter::loadCsvFile(std::string file) {
     m_file = file;
 
     std::string text = "Loaded CSV file size: ";
@@ -24,22 +24,19 @@ bool DSDataFormatter::loadCsvFile(std::string file) {
 
     csv::Parser csvfile = csv::Parser(m_file, csv::ePURE);
 
-    // print result
-    printToConsole(csvfile.getHeaderElement(0));
+    for (int i = 0; i < csvfile.rowCount(); i++) {
+        dataPoint dp = {
+            std::stof(csvfile[i]["Longitude"]),
+            std::stof(csvfile[i]["Latitude"]),
+            std::stof(csvfile[i]["Education"]),
+            std::stof(csvfile[i]["Income"])
+        };
+        m_dataPoints.push_back(dp);
+        if (i % 100 == 0){
+            printToConsole("row #" + std::to_string(i + 1) + " point1: " + std::to_string(dp.x1) + ", " + std::to_string(dp.y2) + ", point2: " + std::to_string(dp.x2) + ", " + std::to_string(dp.y2));
+        }
+    }
 
-    std::stringstream buffer;
-    buffer << csvfile[0] << std::endl;
-    printToConsole(buffer.str());
-
-    std::stringstream buffer2;
-    buffer2 << csvfile.rowCount() << std::endl;
-    printToConsole(buffer2.str());
-
-    std::stringstream buffer3;
-    buffer3 << csvfile.columnCount() << std::endl;
-    printToConsole(buffer3.str());
-
-    return false;
 }
 
 bool DSDataFormatter::update() {
