@@ -15,7 +15,7 @@ class DSDataFormatter
     std::string m_file;
 
 public:
-    DSDataFormatter(GSGThreadLock *lock);
+    DSDataFormatter();
     ~DSDataFormatter();
 
     bool loadCsvFile(std::string file);

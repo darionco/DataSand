@@ -7,8 +7,8 @@
 
 #include "../GSGThreading/GSGThreadLock.h"
 
-DSDataFormatter::DSDataFormatter(GSGThreadLock *lock) {
-    m_lock = lock;
+DSDataFormatter::DSDataFormatter() {
+    m_lock = new GSGThreadLock();
 }
 
 DSDataFormatter::~DSDataFormatter() {

@@ -5,19 +5,20 @@
 #ifndef DATASAND_DSTASKSCHEDULER_H
 #define DATASAND_DSTASKSCHEDULER_H
 
-class GSGThread;
-class GSGThreadLock;
 class DSDataFormatter;
+class DSGraphics;
 
 class DSTaskScheduler
 {
-    GSGThread *m_dataFormatterThread;
-    GSGThreadLock *m_dataFormatterLock;
+    DSDataFormatter *m_dataFormatter;
+    DSGraphics *m_graphics;
 
 public:
-    DSTaskScheduler();
+    DSTaskScheduler(DSDataFormatter *dataFormatter, DSGraphics *graphics);
     ~DSTaskScheduler();
-    DSDataFormatter *m_dataFormatter;
+
+    DSDataFormatter *dataFormatter();
+    DSGraphics *graphics();
 };
 
 #endif //DATASAND_DSTASKSCHEDULER_H
