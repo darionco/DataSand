@@ -6,6 +6,7 @@
 #define DATASAND_DSGRAPHICS_H
 
 #include "ppapi/cpp/graphics_3d.h"
+#include "ppapi/utility/completion_callback_factory.h"
 
 class DSGraphics {
     int32_t m_width;
@@ -16,6 +17,9 @@ class DSGraphics {
 public:
     DSGraphics(pp::Graphics3D *context, int32_t width, int32_t height);
     ~DSGraphics();
+
+    void render();
+    pp::Graphics3D *context();
 };
 
 #endif //DATASAND_DSGRAPHICS_H

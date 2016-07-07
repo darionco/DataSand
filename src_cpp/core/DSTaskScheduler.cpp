@@ -8,13 +8,13 @@
 #include "DSDataFormater.h"
 #include "DSGraphics.h"
 
-DSTaskScheduler::DSTaskScheduler(DSDataFormatter *dataFormatter, DSGraphics *graphics) {
+DSTaskScheduler::DSTaskScheduler(DSDataFormatter *dataFormatter, DSGraphics *graphics) : m_callbackFactory(this) {
     printToConsole("Initializing task scheduler...");
 
+    m_dataFormatter = dataFormatter;
     m_graphics = graphics;
 
-    m_dataFormatter = dataFormatter;
-    m_dataFormatter->update();
+    mainLoop(0);
 }
 
 DSTaskScheduler::~DSTaskScheduler() {
@@ -27,3 +27,13 @@ DSDataFormatter *DSTaskScheduler::dataFormatter() {
 DSGraphics *DSTaskScheduler::graphics() {
     return m_graphics;
 }
+
+void DSTaskScheduler::mainLoop(int32_t) {
+    m_dataFormatter->update();
+    m_graphics->render();
+
+    m_graphics->context()->SwapBuffers(
+            m_callbackFactory.NewCallback(&DSTaskScheduler::mainLoop)
+    );
+}
+
