@@ -1,22 +1,24 @@
 #include "DataSand.h"
 #include "core/printToConsole.h"
-#include "core/DSTaskScheduler.h"
 
 DataSandInstance::DataSandInstance(PP_Instance instance) : pp::Instance(instance) {
     setGlobalInstance(this);
+    m_taskScheduler = new DSTaskScheduler();
 }
 
-DataSandInstance::~DataSandInstance() { }
+DataSandInstance::~DataSandInstance() {
+    delete m_taskScheduler;
+}
 
 void DataSandInstance::HandleMessage(const pp::Var &var_message) {
     if (!var_message.is_string()) {
         return;
     }
-
-    std::string message = var_message.AsString();
-    if (message == "Hello") {
-        printToConsole("Holy chow!");
-    }
+//
+//    std::string message = var_message.AsString();
+//    if (message == "Hello") {
+//        printToConsole("Holy chow!");
+//    }
 }
 
 void DataSandInstance::printToConsole(std::string message) {
@@ -25,7 +27,7 @@ void DataSandInstance::printToConsole(std::string message) {
 
 DataSandModule::DataSandModule() : pp::Module() { }
 
-DataSandModule::~DataSandModule() { }
+DataSandModule::~DataSandModule() {}
 
 pp::Instance *DataSandModule::CreateInstance(PP_Instance instance) {
     return new DataSandInstance(instance);

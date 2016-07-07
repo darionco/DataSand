@@ -9,7 +9,11 @@
 #include "ppapi/cpp/module.h"
 #include "ppapi/cpp/var.h"
 
+#include "core/DSTaskScheduler.h"
+
 class DataSandInstance : public pp::Instance {
+    DSTaskScheduler *m_taskScheduler;
+
 public:
     /// The constructor creates the plugin-side instance.
     /// @param[in] instance the handle to the browser-side plugin instance.
