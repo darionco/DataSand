@@ -13,13 +13,21 @@ class DSGraphics {
     int32_t m_width;
     int32_t m_height;
 
+    GLfloat m_pixelScaleX;
+    GLfloat m_pixelScaleY;
+
+    GLfloat m_dataPointWidth;
+    GLfloat m_dataPointHeight;
+
     pp::Graphics3D *m_context;
 
     GLuint m_vertexShader;
     GLuint m_fragmentShader;
 
-    GLuint m_positionSlot;
-    GLuint m_colorSlot;
+    GLuint m_positionSlot01;
+    GLuint m_positionSlot02;
+    GLuint m_colorSlot01;
+    GLuint m_colorSlot02;
     GLuint m_program;
 
     GLuint m_vertexBuffer;
