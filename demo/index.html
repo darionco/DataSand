@@ -10,7 +10,9 @@
         // Indicate load success.
         function moduleDidLoad() {
             DataSandModule = document.getElementById('data_sand');
-            DataSandModule.postMessage('Hello');
+            DataSandModule.setAttribute('width', window.document.body.scrollWidth + 'px');
+            DataSandModule.setAttribute('height', window.document.body.scrollHeight + 'px');
+//            DataSandModule.postMessage('Hello');
         }
 
         // The 'message' event handler.  This handler is fired when the NaCl module
@@ -22,7 +24,7 @@
         }
     </script>
 </head>
-<body>
+<body style="margin: 0px; padding: 0px">
 <div id="listener">
     <script type="text/javascript">
         var listener = document.getElementById('listener');
