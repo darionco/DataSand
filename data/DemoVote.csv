@@ -1,4 +1,4 @@
-Row id,Longitude,Latitude,GeoName,StateAbb,State,County,TotalPop,MedAge,Education,Unemployment,Income,MedHomeValue,Obama,Zipcodes,Winner,RealZip,ElectoralFraction,ZipNumbers,Dates
+Row id,Longitude,Latitude,GeoName,StateAbb,State,County,TotalPop,MedAge,HistogramX,Unemployment,Income,MedHomeValue,Obama,Zipcodes,Winner,RealZip,ElectoralFraction,ZipNumbers,Dates
 0,-86.396153,32.461513,Prattville city,AL,Alabama,Autauga County,28676,36.2,25.4,8.6,24527,129015,0.2654,36066,Romney,36066,0.08858902,36066,2010-01-01
 1,-86.708666,32.660992,Billingsley town,AL,Alabama,Autauga County,132,36.9,9.3,9.4,17993,59000,0.2654,36006,Romney,36006,0.000407789,36006,2010-01-02
 2,-86.658236,32.432024,Autaugaville town,AL,Alabama,Autauga County,939,37.3,9.2,10.3,15078,61364,0.2654,36003,Romney,36003,0.002900861,36003,2010-01-03

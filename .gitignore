@@ -39,4 +39,5 @@ nacl_sdk
 # Log Files
 *.log
 
+*.DS_Store
 

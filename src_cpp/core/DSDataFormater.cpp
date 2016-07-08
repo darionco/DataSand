@@ -33,7 +33,8 @@ void DSDataFormatter::loadCsvFile(std::string file) {
     float minLat = maxLat;
     float maxLong = std::stof(csvfile[0]["Longitude"]);
     float minLong = maxLong;
-    float x2Max = 0;
+    float x2Max = std::stof(csvfile[0]["HistogramX"]);
+    float x2Min = x2Max;
 
     // buckets contains int that tells number of datapoints each bucket have
     std::vector<int> buckets (10, 0);
@@ -54,21 +55,22 @@ void DSDataFormatter::loadCsvFile(std::string file) {
     for (int i = 0; i < csvfile.rowCount(); i++) {
         float longitude = std::stof(csvfile[i]["Longitude"]);
         float latitude = std::stof(csvfile[i]["Latitude"]);
-        float x2 = std::stof(csvfile[i]["Education"]);
+        float x2 = std::stof(csvfile[i]["HistogramX"]);
         maxLat = std::max(maxLat, latitude);
         minLat = std::min(minLat, latitude);
         maxLong = std::max(maxLong, longitude);
         minLong = std::min(minLong, longitude);
         x2Max = std::max(x2Max, x2);
+        x2Min = std::min(x2Min, x2);
     }
-    float histFactor = MAX_X_AXIS / x2Max;
+    float histFactor = MAX_X_AXIS / (x2Max - x2Min);
     float longFactor = MAX_X_AXIS / (maxLong - minLong);
     float latFactor = MAX_X_AXIS / (maxLat - minLat);
 
     for (int i = 0; i < csvfile.rowCount(); i++) {
         float x1 = (std::stof(csvfile[i]["Longitude"]) - minLong) * longFactor;
         float y1 = (std::stof(csvfile[i]["Latitude"]) - minLat) * latFactor;
-        float x2 = std::stof(csvfile[i]["Education"]) * histFactor;
+        float x2 = (std::stof(csvfile[i]["HistogramX"]) - x2Min) * histFactor;
 
         int x2BucketIndex = x2 / MAX_X_AXIS * NUM_BUCKETS;
         int x2BucketOffset = x2BucketIndex * (bucketSize);
