@@ -23,13 +23,17 @@ void DSDataFormatter::loadCsvFile(std::string file) {
     csv::Parser csvfile = csv::Parser(m_file, csv::ePURE);
     // set x axis max to: 1000
     // each bucket width: 100 (80 capacity) 10 padding each side
-    int MAX_X_AXIS = 1000;
+    int MAX_X_AXIS = 500;
+    int MAX_Y_AXIS = 500;
     int NUM_BUCKETS = 10;
-    int BUCKET_PADDING = 10;
+    int BUCKET_PADDING = 15;
     int bucketSize = MAX_X_AXIS / NUM_BUCKETS;
     int bucketCapacity = bucketSize - (BUCKET_PADDING * 2);
-    float x2Max;
-    float geoFactor = MAX_X_AXIS / 360;
+    float maxLat = std::stof(csvfile[0]["Latitude"]);
+    float minLat = maxLat;
+    float maxLong = std::stof(csvfile[0]["Longitude"]);
+    float minLong = maxLong;
+    float x2Max = 0;
 
     // buckets contains int that tells number of datapoints each bucket have
     std::vector<int> buckets (10, 0);
@@ -45,18 +49,27 @@ void DSDataFormatter::loadCsvFile(std::string file) {
         {0 ,150, 136},
         {0 ,188, 212}
     };
-    
+
     // calculate max x2 value
     for (int i = 0; i < csvfile.rowCount(); i++) {
+        float longitude = std::stof(csvfile[i]["Longitude"]);
+        float latitude = std::stof(csvfile[i]["Latitude"]);
         float x2 = std::stof(csvfile[i]["Education"]);
+        maxLat = std::max(maxLat, latitude);
+        minLat = std::min(minLat, latitude);
+        maxLong = std::max(maxLong, longitude);
+        minLong = std::min(minLong, longitude);
         x2Max = std::max(x2Max, x2);
     }
     float histFactor = MAX_X_AXIS / x2Max;
+    float longFactor = MAX_X_AXIS / (maxLong - minLong);
+    float latFactor = MAX_X_AXIS / (maxLat - minLat);
 
     for (int i = 0; i < csvfile.rowCount(); i++) {
-        float x1 = (std::stof(csvfile[i]["Longitude"]) + 180) * geoFactor;
-        float y1 = (std::stof(csvfile[i]["Latitude"]) + 90) * geoFactor;
+        float x1 = (std::stof(csvfile[i]["Longitude"]) - minLong) * longFactor;
+        float y1 = (std::stof(csvfile[i]["Latitude"]) - minLat) * latFactor;
         float x2 = std::stof(csvfile[i]["Education"]) * histFactor;
+
         int x2BucketIndex = x2 / MAX_X_AXIS * NUM_BUCKETS;
         int x2BucketOffset = x2BucketIndex * (bucketSize);
         auto color = bucketColors[x2BucketIndex];
@@ -72,7 +85,7 @@ void DSDataFormatter::loadCsvFile(std::string file) {
         };
         m_dataPoints.push_back(dp);
         if (i % 100 == 0){
-            printToConsole("row #" + std::to_string(i + 1) + " color: " + std::to_string(dp.SecondColor[0]) + " point1: " + std::to_string(dp.FirstPosition[0]) + ", " + std::to_string(dp.FirstPosition[1]) + ", point2: " + std::to_string(dp.SecondPosition[0]) + ", " + std::to_string(dp.SecondPosition[1]));
+            // printToConsole("row #" + std::to_string(i + 1) + " color: " + std::to_string(dp.SecondColor[0]) + " point1: " + std::to_string(dp.FirstPosition[0]) + ", " + std::to_string(dp.FirstPosition[1]) + ", point2: " + std::to_string(dp.SecondPosition[0]) + ", " + std::to_string(dp.SecondPosition[1]));
         }
     }
 
