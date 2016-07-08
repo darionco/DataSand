@@ -17,6 +17,8 @@ class DSTaskScheduler
 
     pp::CompletionCallbackFactory<DSTaskScheduler> m_callbackFactory;
 
+    bool m_dataLoaded;
+
 public:
     DSTaskScheduler(DSDataFormatter *dataFormatter, DSGraphics *graphics);
     ~DSTaskScheduler();

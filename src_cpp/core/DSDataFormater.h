@@ -28,6 +28,9 @@ public:
 
     void loadCsvFile(std::string file);
     bool update();
+
+    void *dataPoints();
+    int dataLength();
 };
 
 #endif //DATASAND_DSDATAFORMATER_H

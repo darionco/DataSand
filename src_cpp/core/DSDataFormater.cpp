@@ -96,3 +96,11 @@ bool DSDataFormatter::update() {
     /* return true if the data changed, false otherwise */
     return false;
 }
+
+void *DSDataFormatter::dataPoints() {
+    return static_cast<void*>(m_dataPoints.data());
+}
+
+int DSDataFormatter::dataLength() {
+    return m_dataPoints.size();
+}

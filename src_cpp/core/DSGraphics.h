@@ -9,6 +9,13 @@
 #include "ppapi/cpp/graphics_3d.h"
 #include "ppapi/utility/completion_callback_factory.h"
 
+typedef struct {
+    float positionOne[2];
+    float positionTwo[2];
+    float colorOne[3];
+    float colorTwo[3];
+} Vertex;
+
 class DSGraphics {
     int32_t m_width;
     int32_t m_height;
@@ -18,6 +25,9 @@ class DSGraphics {
 
     GLfloat m_dataPointWidth;
     GLfloat m_dataPointHeight;
+
+    GLfloat m_offsetOriginX;
+    GLfloat m_offsetOriginY;
 
     pp::Graphics3D *m_context;
 
@@ -36,12 +46,18 @@ class DSGraphics {
     GLuint m_vertexBuffer;
     GLuint m_indexBuffer;
 
+    GLuint m_indexBufferCount;
+
+    void _addDataPoint(GLushort *indexBuffer, Vertex *vertexBuffer, int vertexBufferOffset, Vertex &dataPoint);
+
 public:
     DSGraphics(pp::Graphics3D *context, int32_t width, int32_t height);
     ~DSGraphics();
 
     void render();
     pp::Graphics3D *context();
+
+    void loadData(void *data, int length);
 };
 
 #endif //DATASAND_DSGRAPHICS_H

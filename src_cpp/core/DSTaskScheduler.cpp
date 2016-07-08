@@ -11,6 +11,7 @@
 DSTaskScheduler::DSTaskScheduler(DSDataFormatter *dataFormatter, DSGraphics *graphics) : m_callbackFactory(this) {
     printToConsole("Initializing task scheduler...");
 
+    m_dataLoaded = false;
     m_dataFormatter = dataFormatter;
     m_graphics = graphics;
 
@@ -29,7 +30,12 @@ DSGraphics *DSTaskScheduler::graphics() {
 }
 
 void DSTaskScheduler::mainLoop(int32_t) {
-    m_dataFormatter->update();
+
+    if (!m_dataLoaded && m_dataFormatter->dataLength()) {
+        m_graphics->loadData(m_dataFormatter->dataPoints(), m_dataFormatter->dataLength());
+        m_dataLoaded = true;
+    }
+
     m_graphics->render();
 
     m_graphics->context()->SwapBuffers(
