@@ -90,7 +90,7 @@ void DSDataFormatter::loadCsvFile(std::string file) {
             // printToConsole("row #" + std::to_string(i + 1) + " color: " + std::to_string(dp.SecondColor[0]) + " point1: " + std::to_string(dp.FirstPosition[0]) + ", " + std::to_string(dp.FirstPosition[1]) + ", point2: " + std::to_string(dp.SecondPosition[0]) + ", " + std::to_string(dp.SecondPosition[1]));
         }
     }
-
+    printToConsole("[LOADING DONE]");
 }
 
 bool DSDataFormatter::update() {

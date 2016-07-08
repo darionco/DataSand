@@ -31,6 +31,11 @@
         // simply displays the content of the message in an alert panel.
         function handleMessage(message_event) {
             console.log(message_event.data);
+            if (message_event.data === "[LOADING DONE]") {
+                var loading = document.getElementById('loading-text');
+                loading.style.visibility = "hidden";
+                return;
+            }
         }
     </script>
 </head>
@@ -45,9 +50,12 @@
 
 <div class="" style="position: absolute; top: 0; left: 0;">
     <input type="file" id="file-input">
+    <h3 id="loading-text" style="color: white;">LOADING DATA . . .</h3>
 </div>
 
 <script>
+    var loading = document.getElementById('loading-text');
+    loading.style.visibility = "hidden";
     // Load a csv file
     var onFileLoad = function (e) {
         var csv = e.target.result;
@@ -59,6 +67,7 @@
         var reader = new FileReader();
         reader.onload = onFileLoad;
         reader.readAsText(file);
+        loading.style.visibility = "visible";
     }
     var fileInput = document.getElementById('file-input');
     fileInput.addEventListener('change', onFileInputChange);
