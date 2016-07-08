@@ -218,10 +218,10 @@ void DSGraphics::_addDataPoint(GLuint *indexBuffer, Vertex *vertexBuffer, int ve
             vertexBuffer[i].colorTwo[j] = colors[c%5][j];
         }
 
-        vertexBuffer[i].positionOne[0] = m_offsetOriginX + (g_vertices[i].positionOne[0] * m_dataPointWidth) + (dataPoint.positionOne[0] / sizeFactor);
-        vertexBuffer[i].positionOne[1] = m_offsetOriginY + (g_vertices[i].positionOne[1] * m_dataPointHeight) + (dataPoint.positionOne[1] / sizeFactor);
+        vertexBuffer[i].positionOne[0] = m_offsetOriginX + (g_vertices[i].positionOne[0] * m_dataPointWidth) + (fmod(dataPoint.positionOne[0], 500.0f) / sizeFactor);
+        vertexBuffer[i].positionOne[1] = m_offsetOriginY + (g_vertices[i].positionOne[1] * m_dataPointHeight) + (fmod(dataPoint.positionOne[1], 500.0f) / sizeFactor);
 
-        vertexBuffer[i].positionTwo[0] = m_offsetOriginX + (g_vertices[i].positionTwo[0] * m_dataPointWidth) + (dataPoint.positionTwo[0] / sizeFactor);
-        vertexBuffer[i].positionTwo[1] = m_offsetOriginY + (g_vertices[i].positionTwo[1] * m_dataPointHeight) + (dataPoint.positionTwo[1] / sizeFactor);
+        vertexBuffer[i].positionTwo[0] = m_offsetOriginX + (g_vertices[i].positionTwo[0] * m_dataPointWidth) + (fmod(dataPoint.positionTwo[0], 500.0f) / sizeFactor);
+        vertexBuffer[i].positionTwo[1] = m_offsetOriginY + (g_vertices[i].positionTwo[1] * m_dataPointHeight) + (fmod(dataPoint.positionTwo[1], 500.0f) / sizeFactor);
     }
 }
