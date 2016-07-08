@@ -22,7 +22,7 @@ Vertex g_vertices[] = {
         {{-1, -1}, {-1, -1}, {0, 0, 0}, {1, 1, 1}}
 };
 
-const GLubyte g_indices[] = {
+const GLuint g_indices[] = {
         0, 1, 2,
         2, 3, 0
 };
@@ -152,7 +152,7 @@ void DSGraphics::render() {
     glEnableVertexAttribArray(m_colorSlot02);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-    glDrawElements(GL_TRIANGLES, m_indexBufferCount, GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLES, m_indexBufferCount, GL_UNSIGNED_INT, 0);
 }
 
 pp::Graphics3D *DSGraphics::context() {
@@ -166,10 +166,10 @@ void DSGraphics::loadData(void *data, int length) {
     size_t indexBufferCount = length * 6;
     size_t vertexBufferCount = length * 4;
 
-    size_t indexBufferLength = indexBufferCount * sizeof(GLushort);
+    size_t indexBufferLength = indexBufferCount * sizeof(GLuint);
     size_t vertexBufferLength = vertexBufferCount * sizeof(Vertex);
 
-    GLushort *indices = (GLushort*)malloc(indexBufferLength);
+    GLuint *indices = (GLuint*)malloc(indexBufferLength);
     Vertex *vertices = (Vertex*)malloc(vertexBufferLength);
 
     for (int i = 0; i < length; ++i) {
@@ -193,7 +193,7 @@ void DSGraphics::loadData(void *data, int length) {
     printToConsole("DSGraphics::loadData: END");
 }
 
-void DSGraphics::_addDataPoint(GLushort *indexBuffer, Vertex *vertexBuffer, int vertexBufferOffset, Vertex &dataPoint) {
+void DSGraphics::_addDataPoint(GLuint *indexBuffer, Vertex *vertexBuffer, int vertexBufferOffset, Vertex &dataPoint) {
 
     float colors[5][3] = {
             { 105.0f/255.0f,210.0f/255.0f,231.0f/255.0f },

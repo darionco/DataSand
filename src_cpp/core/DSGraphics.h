@@ -57,7 +57,7 @@ class DSGraphics {
     double m_transitionTime;
     double m_animationTarget;
 
-    void _addDataPoint(GLushort *indexBuffer, Vertex *vertexBuffer, int vertexBufferOffset, Vertex &dataPoint);
+    void _addDataPoint(GLuint *indexBuffer, Vertex *vertexBuffer, int vertexBufferOffset, Vertex &dataPoint);
 
 public:
     DSGraphics(pp::Graphics3D *context, int32_t width, int32_t height);
