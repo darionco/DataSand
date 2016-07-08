@@ -6,6 +6,7 @@
 #include "printToConsole.h"
 
 #include <math.h>
+#include <sys/time.h>
 
 #include "ppapi/lib/gl/gles2/gl2ext_ppapi.h"
 #include "ppapi/cpp/module.h"
@@ -60,6 +61,17 @@ DSGraphics::DSGraphics(pp::Graphics3D *context, int32_t width, int32_t height) {
     m_indexBufferCount = 0;
 
     m_animationTest = 0.0f;
+
+    m_animating = false;
+    m_waitTime = 3.0;
+    m_transitionTime = 1.2;
+    m_elapsedTime = 0;
+    m_animationTarget = 0;
+
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    m_newTime = tp.tv_sec * 1000 + tp.tv_usec / 1000;
+    m_oldTime = m_newTime;
 }
 
 DSGraphics::~DSGraphics() {
@@ -67,6 +79,14 @@ DSGraphics::~DSGraphics() {
 }
 
 void DSGraphics::render() {
+
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    m_newTime = tp.tv_sec * 1000 + tp.tv_usec / 1000;
+
+    double delta = fmin(0.3, ((double)(m_newTime - m_oldTime)) / 1000.0);
+    m_oldTime = m_newTime;
+
     glClearColor(0.05, 0.05, 0.05, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -76,8 +96,26 @@ void DSGraphics::render() {
 
     glUseProgram(m_program);
 
-    m_animationTest += 0.01;
-    glUniform1f(m_interpolationUniform, (sin(m_animationTest) + 1.0) / 2.0);
+
+    m_elapsedTime += delta;
+    if (m_elapsedTime < 0) m_elapsedTime = 0;
+
+    if (m_animating && m_elapsedTime >= m_transitionTime) {
+        m_elapsedTime = 0;
+        m_animating = false;
+    } else if (!m_animating && m_elapsedTime >= m_waitTime) {
+        m_animating = true;
+        m_elapsedTime = 0;
+        m_animationTest = m_animationTarget * M_PI;
+        m_animationTarget = (m_animationTarget == 0) ? 1.0 : 0;
+    }
+
+    if (m_animating) {
+        m_animationTest += M_PI * (delta / m_transitionTime);
+        glUniform1f(m_interpolationUniform, (cos(m_animationTest) + 1.0) / 2.0);
+    } else {
+        glUniform1f(m_interpolationUniform, (cos(m_animationTarget * M_PI) + 1.0) / 2.0);
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 

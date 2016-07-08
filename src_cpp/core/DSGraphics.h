@@ -48,6 +48,15 @@ class DSGraphics {
 
     GLuint m_indexBufferCount;
 
+    double m_newTime;
+    double m_oldTime;
+
+    bool m_animating;
+    double m_elapsedTime;
+    double m_waitTime;
+    double m_transitionTime;
+    double m_animationTarget;
+
     void _addDataPoint(GLushort *indexBuffer, Vertex *vertexBuffer, int vertexBufferOffset, Vertex &dataPoint);
 
 public:
