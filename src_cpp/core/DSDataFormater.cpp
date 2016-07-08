@@ -21,6 +21,7 @@ void DSDataFormatter::loadCsvFile(std::string file) {
     m_file = file;
 
     csv::Parser csvfile = csv::Parser(m_file, csv::ePURE);
+    printToConsole("# CSV Rows loaded: " + std::to_string(csvfile.rowCount()));
     // set x axis max to: 1000
     // each bucket width: 100 (80 capacity) 10 padding each side
     int MAX_X_AXIS = 500;
