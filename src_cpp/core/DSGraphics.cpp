@@ -34,11 +34,11 @@ DSGraphics::DSGraphics(pp::Graphics3D *context, int32_t width, int32_t height) {
     m_pixelScaleX = 1.0f / m_width;
     m_pixelScaleY = 1.0f / m_height;
 
-    m_dataPointWidth = m_pixelScaleX * 10.0f;
-    m_dataPointHeight = m_pixelScaleY * 10.0f;
+    m_dataPointWidth = m_pixelScaleX * 2.0f;
+    m_dataPointHeight = m_pixelScaleY * 2.0f;
 
-    m_offsetOriginX = -0.5f;
-    m_offsetOriginY = -0.5f;
+    m_offsetOriginX = -0.9f;
+    m_offsetOriginY = -0.9f;
 
     m_vertexShader = compileShader(GL_VERTEX_SHADER, dataSand_vertex_shader_src);
 //    printToConsole("m_vertexShader: " + std::to_string(m_vertexShader));
@@ -76,7 +76,7 @@ void DSGraphics::render() {
 
     glUseProgram(m_program);
 
-    m_animationTest += 0.05;
+    m_animationTest += 0.01;
     glUniform1f(m_interpolationUniform, (sin(m_animationTest) + 1.0) / 2.0);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
@@ -156,18 +156,34 @@ void DSGraphics::loadData(void *data, int length) {
 }
 
 void DSGraphics::_addDataPoint(GLushort *indexBuffer, Vertex *vertexBuffer, int vertexBufferOffset, Vertex &dataPoint) {
+
+    float colors[5][3] = {
+            { 105.0f/255.0f,210.0f/255.0f,231.0f/255.0f },
+            { 167.0f/255.0f,219.0f/255.0f,216.0f/255.0f },
+            { 224.0f/255.0f,228.0f/255.0f,204.0f/255.0f },
+            { 243.0f/255.0f,134.0f/255.0f,48.0f/255.0f },
+            { 250.0f/255.0f,105.0f/255.0f,0.0f/255.0f }
+    };
+
+    float sizeFactor = 500.0f / (2.0f * 0.9f);
+
     for (int i = 0; i < 6; ++i) {
         indexBuffer[i] = g_indices[i] + vertexBufferOffset;
     }
 
+    int c = ((int)(dataPoint.positionTwo[0]/100));
+
     for (int i = 0; i < 4; ++i) {
-        std::copy(std::begin(dataPoint.colorOne), std::end(dataPoint.colorOne), std::begin(vertexBuffer[i].colorOne));
-        std::copy(std::begin(dataPoint.colorTwo), std::end(dataPoint.colorTwo), std::begin(vertexBuffer[i].colorTwo));
 
-        vertexBuffer[i].positionOne[0] = m_offsetOriginX + (g_vertices[i].positionOne[0] * m_dataPointWidth) + (dataPoint.positionOne[0] / 1000);
-        vertexBuffer[i].positionOne[1] = m_offsetOriginY + (g_vertices[i].positionOne[1] * m_dataPointHeight) + (dataPoint.positionOne[1] / 1000);
+        for (int j = 0; j < 3; ++j) {
+            vertexBuffer[i].colorOne[j] = colors[c%5][j];
+            vertexBuffer[i].colorTwo[j] = colors[c%5][j];
+        }
 
-        vertexBuffer[i].positionTwo[0] = m_offsetOriginX + (g_vertices[i].positionTwo[0] * m_dataPointWidth) + (dataPoint.positionTwo[0] / 1000);
-        vertexBuffer[i].positionTwo[1] = m_offsetOriginY + (g_vertices[i].positionTwo[1] * m_dataPointHeight) + (dataPoint.positionTwo[1] / 1000);
+        vertexBuffer[i].positionOne[0] = m_offsetOriginX + (g_vertices[i].positionOne[0] * m_dataPointWidth) + (dataPoint.positionOne[0] / sizeFactor);
+        vertexBuffer[i].positionOne[1] = m_offsetOriginY + (g_vertices[i].positionOne[1] * m_dataPointHeight) + (dataPoint.positionOne[1] / sizeFactor);
+
+        vertexBuffer[i].positionTwo[0] = m_offsetOriginX + (g_vertices[i].positionTwo[0] * m_dataPointWidth) + (dataPoint.positionTwo[0] / sizeFactor);
+        vertexBuffer[i].positionTwo[1] = m_offsetOriginY + (g_vertices[i].positionTwo[1] * m_dataPointHeight) + (dataPoint.positionTwo[1] / sizeFactor);
     }
 }
