@@ -220,7 +220,7 @@ void DSGraphics::_addDataPoint(GLuint *indexBuffer, Vertex *vertexBuffer, int ve
             { 250.0f,105.0f,0.0f }
     };
 
-    float sizeFactor = 500.0f;
+    const float sizeFactor = 500.0f;
 
     for (int i = 0; i < 6; ++i) {
         indexBuffer[i] = g_indices[i] + vertexBufferOffset;
@@ -237,17 +237,17 @@ void DSGraphics::_addDataPoint(GLuint *indexBuffer, Vertex *vertexBuffer, int ve
 
         vertexBuffer[i].positionOne[0] = 	(g_vertices[i].positionOne[0] * m_dataPointWidth) + 
 											m_dataPointWidth +
-											((fmod(dataPoint.positionOne[0], 500.0f) / 500.0f) * (65535.0f - (m_dataPointWidth * 2.0f)));
+											((fmod(dataPoint.positionOne[0], sizeFactor) / sizeFactor) * (65535.0f - (m_dataPointWidth * 2.0f)));
         vertexBuffer[i].positionOne[1] = 	(g_vertices[i].positionOne[1] * m_dataPointHeight) +
 											m_dataPointHeight +
-											((fmod(dataPoint.positionOne[1], 500.0f) / 500.0f) * (65535.0f - (m_dataPointHeight * 2.0f)));
+											((fmod(dataPoint.positionOne[1], sizeFactor) / sizeFactor) * (65535.0f - (m_dataPointHeight * 2.0f)));
 
         vertexBuffer[i].positionTwo[0] = 	(g_vertices[i].positionTwo[0] * m_dataPointWidth) + 
 											m_dataPointWidth +
-											((fmod(dataPoint.positionTwo[0], 500.0f) / 500.0f) * (65535.0f - (m_dataPointWidth * 2.0f)));
+											((fmod(dataPoint.positionTwo[0], sizeFactor) / sizeFactor) * (65535.0f - (m_dataPointWidth * 2.0f)));
         vertexBuffer[i].positionTwo[1] = 	(g_vertices[i].positionTwo[1] * m_dataPointHeight) +
 											m_dataPointHeight +
-											((fmod(dataPoint.positionTwo[1], 500.0f) / 500.0f) * (65535.0f - (m_dataPointHeight * 2.0f)));
+											((fmod(dataPoint.positionTwo[1], sizeFactor) / sizeFactor) * (65535.0f - (m_dataPointHeight * 2.0f)));
 		
 		vertexBuffer[i].timeMultiplier = floor((((float)vertexBuffer[i].positionTwo[0]) * 0.8) + floor(((float)vertexBuffer[i].positionTwo[1]) * 0.2));
 		
