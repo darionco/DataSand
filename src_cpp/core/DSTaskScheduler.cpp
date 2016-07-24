@@ -14,6 +14,13 @@ DSTaskScheduler::DSTaskScheduler(DSDataFormatter *dataFormatter, DSGraphics *gra
     m_dataLoaded = false;
     m_dataFormatter = dataFormatter;
     m_graphics = graphics;
+	
+	unsigned long maxNumber = 0;
+	for (int i = 0, n = sizeof(GLushort) * 8; i < n; ++i) {
+		maxNumber |= (1 << i);
+	}
+	
+	printToConsole("Max GLushort: " + std::to_string(maxNumber));
 
     mainLoop(0);
 }

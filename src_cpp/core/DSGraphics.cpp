@@ -32,8 +32,10 @@ DSGraphics::DSGraphics(pp::Graphics3D *context, int32_t width, int32_t height) {
     m_width = width;
     m_height = height;
 
-    m_pixelScaleX = 1.0f / m_width;
-    m_pixelScaleY = 1.0f / m_height;
+    m_pixelScaleX = floor(65535.0f / m_width);
+    m_pixelScaleY = floor(65535.0f / m_height);
+	
+	printToConsole("width:" + std::to_string(m_width) + " height:" + std::to_string(m_height) + " px:" + std::to_string(m_pixelScaleX) + " py:" + std::to_string(m_pixelScaleY));
 
     m_dataPointWidth = m_pixelScaleX * 2.0f;
     m_dataPointHeight = m_pixelScaleY * 2.0f;
@@ -55,16 +57,20 @@ DSGraphics::DSGraphics(pp::Graphics3D *context, int32_t width, int32_t height) {
 
     m_positionSlot02 = glGetAttribLocation(m_program, "positionTwo");
     m_colorSlot02 = glGetAttribLocation(m_program, "colorTwo");
+	
+	m_timeMultiplierSlot = glGetAttribLocation(m_program, "timeMultiplier");
 
     m_interpolationUniform = glGetUniformLocation(m_program, "interpolation");
+	m_changeUniform = glGetUniformLocation(m_program, "change");
 
     m_indexBufferCount = 0;
 
     m_animationTest = 0.0f;
+	m_animationChange = 1.0f;
 
     m_animating = false;
     m_waitTime = 3.0;
-    m_transitionTime = 1.2;
+    m_transitionTime = 1.5;
     m_elapsedTime = 0;
     m_animationTarget = 0;
 
@@ -106,22 +112,25 @@ void DSGraphics::render() {
     } else if (!m_animating && m_elapsedTime >= m_waitTime) {
         m_animating = true;
         m_elapsedTime = 0;
-        m_animationTest = m_animationTarget * M_PI;
+        m_animationTest = m_animationTarget;
         m_animationTarget = (m_animationTarget == 0) ? 1.0 : 0;
+		m_animationChange = (m_animationTarget == 0) ? -1.0 : 1.0;
     }
 
     if (m_animating) {
-        m_animationTest += M_PI * (delta / m_transitionTime);
-        glUniform1f(m_interpolationUniform, (cos(m_animationTest) + 1.0) / 2.0);
+        m_animationTest += (delta / m_transitionTime) * m_animationChange;
+        glUniform1f(m_interpolationUniform, m_animationTest);
     } else {
-        glUniform1f(m_interpolationUniform, (cos(m_animationTarget * M_PI) + 1.0) / 2.0);
+        glUniform1f(m_interpolationUniform, m_animationTarget);
     }
+	
+	glUniform1f(m_changeUniform, m_animationChange);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
     glVertexAttribPointer(m_positionSlot01,
                           2,
-                          GL_FLOAT,
+                          GL_UNSIGNED_SHORT,
                           GL_FALSE,
                           sizeof(Vertex),
                           reinterpret_cast<void*>(offsetof(Vertex, positionOne)));
@@ -129,7 +138,7 @@ void DSGraphics::render() {
 
     glVertexAttribPointer(m_colorSlot01,
                           3,
-                          GL_FLOAT,
+                          GL_UNSIGNED_BYTE,
                           GL_FALSE,
                           sizeof(Vertex),
                           reinterpret_cast<void*>(offsetof(Vertex, colorOne)));
@@ -137,7 +146,7 @@ void DSGraphics::render() {
 
     glVertexAttribPointer(m_positionSlot02,
                           2,
-                          GL_FLOAT,
+                          GL_UNSIGNED_SHORT,
                           GL_FALSE,
                           sizeof(Vertex),
                           reinterpret_cast<void*>(offsetof(Vertex, positionTwo)));
@@ -145,11 +154,19 @@ void DSGraphics::render() {
 
     glVertexAttribPointer(m_colorSlot02,
                           3,
-                          GL_FLOAT,
+                          GL_UNSIGNED_BYTE,
                           GL_FALSE,
                           sizeof(Vertex),
                           reinterpret_cast<void*>(offsetof(Vertex, colorTwo)));
     glEnableVertexAttribArray(m_colorSlot02);
+	
+	glVertexAttribPointer(m_timeMultiplierSlot,
+                          1,
+                          GL_UNSIGNED_SHORT,
+                          GL_FALSE,
+                          sizeof(Vertex),
+                          reinterpret_cast<void*>(offsetof(Vertex, timeMultiplier)));
+    glEnableVertexAttribArray(m_timeMultiplierSlot);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
     glDrawElements(GL_TRIANGLES, m_indexBufferCount, GL_UNSIGNED_INT, 0);
@@ -161,7 +178,7 @@ pp::Graphics3D *DSGraphics::context() {
 
 void DSGraphics::loadData(void *data, int length) {
     printToConsole("DSGraphics::loadData: " + std::to_string(length));
-    Vertex *rawData = static_cast<Vertex*>(data);
+    Vertex_large *rawData = static_cast<Vertex_large*>(data);
 
     size_t indexBufferCount = length * 6;
     size_t vertexBufferCount = length * 4;
@@ -193,17 +210,17 @@ void DSGraphics::loadData(void *data, int length) {
     printToConsole("DSGraphics::loadData: END");
 }
 
-void DSGraphics::_addDataPoint(GLuint *indexBuffer, Vertex *vertexBuffer, int vertexBufferOffset, Vertex &dataPoint) {
+void DSGraphics::_addDataPoint(GLuint *indexBuffer, Vertex *vertexBuffer, int vertexBufferOffset, Vertex_large &dataPoint) {
 
     float colors[5][3] = {
-            { 105.0f/255.0f,210.0f/255.0f,231.0f/255.0f },
-            { 167.0f/255.0f,219.0f/255.0f,216.0f/255.0f },
-            { 224.0f/255.0f,228.0f/255.0f,204.0f/255.0f },
-            { 243.0f/255.0f,134.0f/255.0f,48.0f/255.0f },
-            { 250.0f/255.0f,105.0f/255.0f,0.0f/255.0f }
+            { 105.0f,210.0f,231.0f },
+            { 167.0f,219.0f,216.0f },
+            { 224.0f,228.0f,204.0f },
+            { 243.0f,134.0f,48.0f },
+            { 250.0f,105.0f,0.0f }
     };
 
-    float sizeFactor = 500.0f / (2.0f * 0.9f);
+    float sizeFactor = 500.0f;
 
     for (int i = 0; i < 6; ++i) {
         indexBuffer[i] = g_indices[i] + vertexBufferOffset;
@@ -214,14 +231,26 @@ void DSGraphics::_addDataPoint(GLuint *indexBuffer, Vertex *vertexBuffer, int ve
     for (int i = 0; i < 4; ++i) {
 
         for (int j = 0; j < 3; ++j) {
-            vertexBuffer[i].colorOne[j] = colors[c%5][j];
-            vertexBuffer[i].colorTwo[j] = colors[c%5][j];
+            vertexBuffer[i].colorOne[j] = dataPoint.colorOne[j];// colors[c%5][j];
+            vertexBuffer[i].colorTwo[j] = dataPoint.colorTwo[j];// colors[c%5][j];
         }
 
-        vertexBuffer[i].positionOne[0] = m_offsetOriginX + (g_vertices[i].positionOne[0] * m_dataPointWidth) + (dataPoint.positionOne[0] / sizeFactor);
-        vertexBuffer[i].positionOne[1] = m_offsetOriginY + (g_vertices[i].positionOne[1] * m_dataPointHeight) + (dataPoint.positionOne[1] / sizeFactor);
+        vertexBuffer[i].positionOne[0] = 	(g_vertices[i].positionOne[0] * m_dataPointWidth) + 
+											m_dataPointWidth +
+											((fmod(dataPoint.positionOne[0], 500.0f) / 500.0f) * (65535.0f - (m_dataPointWidth * 2.0f)));
+        vertexBuffer[i].positionOne[1] = 	(g_vertices[i].positionOne[1] * m_dataPointHeight) +
+											m_dataPointHeight +
+											((fmod(dataPoint.positionOne[1], 500.0f) / 500.0f) * (65535.0f - (m_dataPointHeight * 2.0f)));
 
-        vertexBuffer[i].positionTwo[0] = m_offsetOriginX + (g_vertices[i].positionTwo[0] * m_dataPointWidth) + (dataPoint.positionTwo[0] / sizeFactor);
-        vertexBuffer[i].positionTwo[1] = m_offsetOriginY + (g_vertices[i].positionTwo[1] * m_dataPointHeight) + (dataPoint.positionTwo[1] / sizeFactor);
+        vertexBuffer[i].positionTwo[0] = 	(g_vertices[i].positionTwo[0] * m_dataPointWidth) + 
+											m_dataPointWidth +
+											((fmod(dataPoint.positionTwo[0], 500.0f) / 500.0f) * (65535.0f - (m_dataPointWidth * 2.0f)));
+        vertexBuffer[i].positionTwo[1] = 	(g_vertices[i].positionTwo[1] * m_dataPointHeight) +
+											m_dataPointHeight +
+											((fmod(dataPoint.positionTwo[1], 500.0f) / 500.0f) * (65535.0f - (m_dataPointHeight * 2.0f)));
+		
+		vertexBuffer[i].timeMultiplier = floor((((float)vertexBuffer[i].positionTwo[0]) * 0.8) + floor(((float)vertexBuffer[i].positionTwo[1]) * 0.2));
+		
+		// printToConsole("positionOne x:" + std::to_string(vertexBuffer[i].positionOne[0]) + " y:" + std::to_string(vertexBuffer[i].positionOne[1]));
     }
 }
