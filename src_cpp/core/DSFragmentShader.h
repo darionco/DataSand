@@ -5,10 +5,6 @@
 #ifndef DATASAND_DSFRAGMENTSHADER_H
 #define DATASAND_DSFRAGMENTSHADER_H
 
-const char dataSand_fragment_shader_src[] =
-        "varying lowp vec4 DestinationColor;\n"
-        "void main(void) {\n"
-        "    gl_FragColor = DestinationColor;\n"
-        "}";
+const char dataSand_fragment_shader_src[];
 
 #endif //DATASAND_DSFRAGMENTSHADER_H
