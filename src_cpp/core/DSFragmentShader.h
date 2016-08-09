@@ -5,6 +5,6 @@
 #ifndef DATASAND_DSFRAGMENTSHADER_H
 #define DATASAND_DSFRAGMENTSHADER_H
 
-const char dataSand_fragment_shader_src[];
+extern const char dataSand_fragment_shader_src[];
 
 #endif //DATASAND_DSFRAGMENTSHADER_H
